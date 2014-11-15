@@ -309,15 +309,18 @@ For full documentation. please see commentary.
     ;; force this immediately -- one off cost
     (unless (use-package-plist-get args :disabled)
 
-      (let* ((ensure (use-package-plist-get args :ensure))
-             (package-name
+      (let* ((ensure (use-package-plist-get args :ensure nil t))
+             (packages-names
               (or (and (eq ensure t)
-                       name)
-                  ensure)))
+                       (list name))
+                  (and (listp ensure)
+                       ensure)
+                  (list ensure))))
 
-        (when package-name
+        (when (= (length packages-names) 0)
           (require 'package)
-          (use-package-ensure-elpa package-name)))
+          (dolist (package-name packages-names)
+            (use-package-ensure-elpa package-name))))
 
 
       (if diminish-var
